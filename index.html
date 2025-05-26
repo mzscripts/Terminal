@@ -13,11 +13,13 @@
     }
     .terminal {
       white-space: pre-line;
+      height: 80vh;
+      overflow-y: auto;
     }
   </style>
 </head>
 <body>
-  <div class="terminal" id="terminal">Booting system...\n</div>
+  <div class="terminal" id="terminal">SYSTEM BOOT INITIALIZED...\n</div>
 
   <script>
     const terminal = document.getElementById('terminal');
@@ -30,6 +32,8 @@
 
     function log(text) {
       terminal.innerText += text + '\n';
+      terminal.scrollTop = terminal.scrollHeight; // Auto-scroll to bottom
+      return new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
     }
 
     function getAppId() {
@@ -38,12 +42,11 @@
     }
 
     async function wakeAllApps() {
-      log("🔧 Warming up all apps in background...\n");
       for (const [id, url] of Object.entries(apps)) {
-        fetch(url, { method: 'GET', mode: 'no-cors' }).then(() => {
-          log(`✅ App ${id} is awake: ${url}`);
+        await fetch(url, { method: 'GET', mode: 'no-cors' }).then(() => {
+          log(`✅ APP_${id}: AWAKE SUCCESSFUL -- ${url}`);
         }).catch(() => {
-          log(`⚠️ Failed to wake App ${id}: ${url}`);
+          log(`⚠️ APP_${id}: AWAKE FAILED -- ${url}`);
         });
       }
     }
@@ -52,40 +55,77 @@
       const url = apps[appId];
 
       if (!url) {
-        log("❌ Invalid app ID. Please use one of the following:");
+        await log("❌ ERROR: INVALID APP ID DETECTED");
         showInstructions();
         return;
       }
 
-      log(`🚀 Launching App ${appId}...`);
-      log(`⏳ Connecting to: ${url}`);
-
       try {
         await fetch(url, { method: 'GET', mode: 'no-cors' });
-        log("✅ App is ready. Redirecting...");
+        await log("✅ APP VERIFICATION COMPLETE -- READY FOR LAUNCH");
+        await log(`REDIRECTING TO TARGET: ${url}`);
         setTimeout(() => {
           window.location.href = url;
         }, 1000);
       } catch (e) {
-        log("⚠️ Failed to connect to the app.");
+        await log("⚠️ CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
       }
     }
 
     function showInstructions() {
-      log("\n=== 📘 Instructions ===");
-      log("To launch an app, add ?app=1, ?app=2, or ?app=3 to the URL.");
-      log("Example: https://yourdomain.com?app=1");
-      log("\nAvailable Apps:");
-      log("1: MZ News - https://mznews.onrender.com");
-      log("2: The Hadith Daily - https://thehadithdaily.onrender.com");
-      log("3: Third App - https://thirdapp.onrender.com");
+      terminal.innerText = ''; // Clear terminal for main page
+      log("\n=== 📘 SYSTEM INSTRUCTIONS ===");
+      log("LAUNCH PROTOCOL: APPEND ?app=1, ?app=2, OR ?app=3 TO URL");
+      log("EXAMPLE: https://yourdomain.com?app=1");
+    }
+
+    // Simulated Dependency Installation
+    async function simulateDependencyInstallation() {
+      await log("CHECKING SYSTEM REQUIREMENTS... DONE");
+      await log("INITIALIZING DEPENDENCY INSTALLATION...");
+      await log("\n=== 📦 DEPENDENCY REPORT ===");
+      
+      await log("Collecting astunparse>=1.6.0 (from app-launcher>=1.0.0)");
+      await log("  Using cached astunparse-1.6.3-py2.py3-none-any.whl.metadata (4.4 kB)");
+      await log("Collecting flatbuffers>=24.3.25 (from app-launcher>=1.0.0)");
+      await log("  Using cached flatbuffers-25.2.10-py2.py3-none-any.whl.metadata (875 bytes)");
+      await log("Collecting gast>=0.2.1 (from app-launcher>=1.0.0)");
+      await log("  Using cached gast-0.6.0-py3-none-any.whl.metadata (1.3 kB)");
+      await log("Collecting google-pasta>=0.1.1 (from app-launcher>=1.0.0)");
+      await log("  Using cached google_pasta-0.2.0-py3-none-any.whl.metadata (814 bytes)");
+      await log("Collecting libclang>=13.0.0 (from app-launcher>=1.0.0)");
+      await log("  Using cached libclang-18.1.1-py2.py3-none-win_amd64.whl.metadata (5.3 kB)");
+      await log("Collecting opt-einsum>=2.3.2 (from app-launcher>=1.0.0)");
+      await log("  Using cached opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)");
+      await log("Collecting protobuf>=3.20.3,<6.0.0dev (from app-launcher>=1.0.0)");
+      await log("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
+      await log("Collecting setuptools (from app-launcher>=1.0.0)");
+      await log("  Using cached setuptools-80.8.0-py3-none-any.whl.metadata (6.6 kB)");
+      await log("Collecting typing-extensions>=3.6.6 (from app-launcher>=1.0.0)");
+      await log("  Using cached typing_extensions-4.13.2-py3-none-any.whl.metadata (3.0 kB)");
+      await log("Collecting wrapt>=1.11.0 (from app-launcher>=1.0.0)");
+      await log("  Using cached wrapt-1.17.2-cp312-cp312-win_amd64.whl.metadata (6.5 kB)");
+      await log("Collecting grpcio>=1.24.3,<2.0 (from app-launcher>=1.0.0)");
+      await log("  Using cached grpcio-1.71.0-cp312-cp312-win_amd64.whl.metadata (4.0 kB)");
+      await log("Collecting numpy (from app-launcher>=1.0.0)");
+      await log("  Using cached numpy-2.1.3-cp312-cp312-win_amd64.whl.metadata (60 kB)");
+      await log("Downloading app-launcher-1.0.0-py3-none-any.whl (108 kB)");
+      await log("   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 108/108 kB 2.5 MB/s eta 0:00:00");
+      await log("Downloading render-client-2.0.0-py3-none-any.whl (25 kB)");
+      await log("   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 25/25 kB 1.8 MB/s eta 0:00:00");
+      await log("\nVERIFYING MODULE INTEGRITY... DONE");
+      await log("DEPENDENCIES: astunparse, flatbuffers, gast, google-pasta, libclang, opt-einsum, protobuf, setuptools, typing-extensions, wrapt, grpcio, numpy -- STATUS: INSTALLED");
+      await log("SYSTEM: render-deployment-agent -- STATUS: READY");
+      await log("\n=== 🚀 APP LAUNCH SEQUENCE ===");
     }
 
     // Boot Process
     const appId = getAppId();
-    wakeAllApps();
     if (appId) {
-      redirectToApp(appId);
+      simulateDependencyInstallation().then(() => {
+        wakeAllApps();
+        redirectToApp(appId);
+      });
     } else {
       showInstructions();
     }
