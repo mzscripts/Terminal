@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Loading Terminal</title>
+  <title>Launching App...</title>
   <style>
     body {
       background-color: black;
@@ -14,69 +14,81 @@
     .terminal {
       white-space: pre-line;
     }
-    .btns {
-      margin-top: 20px;
-    }
-    button {
-      background: #00ff00;
-      color: black;
-      padding: 10px 20px;
-      margin: 5px;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
   </style>
 </head>
 <body>
-  <div class="terminal" id="terminal">
-    Initializing system...\n
-  </div>
-  <div class="btns" id="btns" style="display: none;"></div>
+  <div class="terminal" id="terminal">Booting system...\n</div>
 
   <script>
-    const apps = [
-      { name: "App 1", url: "https://mznews.onrender.com/" },
-      { name: "App 2", url: "https://bhulabhatka.onrender.com/" },
-      { name: "App 3", url: "https://thehadithdaily.onrender.com/" }
-    ];
-
     const terminal = document.getElementById('terminal');
-    const btns = document.getElementById('btns');
 
-    function log(message) {
-      terminal.innerText += message + '\n';
+    const apps = {
+      '1': 'https://mznews.onrender.com',
+      '2': 'https://thehadithdaily.onrender.com',
+      '3': 'https://thirdapp.onrender.com'
+    };
+
+    function log(text) {
+      terminal.innerText += text + '\n';
     }
 
-    async function pingApps() {
-      log("Waking up services...");
-
-      const results = await Promise.all(apps.map(async (app) => {
-        log(`Pinging ${app.name}...`);
-        try {
-          const res = await fetch(app.url, { method: 'GET' });
-          log(`${app.name} is ready ✅`);
-          return { ...app, status: "ready" };
-        } catch (e) {
-          log(`${app.name} failed to respond ❌`);
-          return { ...app, status: "failed" };
-        }
-      }));
-
-      log("\nAll available apps:");
-
-      btns.style.display = 'block';
-      results.forEach(app => {
-        if (app.status === "ready") {
-          const btn = document.createElement('button');
-          btn.innerText = app.name;
-          btn.onclick = () => window.location.href = app.url;
-          btns.appendChild(btn);
-        }
-      });
+    function getAppId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('app');
     }
 
-    pingApps();
+    async function wakeAllApps() {
+      log("🔧 Warming up all apps in background...\n");
+      for (const [id, url] of Object.entries(apps)) {
+        fetch(url, { method: 'GET', mode: 'no-cors' }).then(() => {
+          log(`✅ App ${id} is awake: ${url}`);
+        }).catch(() => {
+          log(`⚠️ Failed to wake App ${id}: ${url}`);
+        });
+      }
+    }
+
+    async function redirectToApp(appId) {
+      const url = apps[appId];
+
+      if (!url) {
+        log("❌ Invalid app ID. Please use one of the following:");
+        showInstructions();
+        return;
+      }
+
+      log(`🚀 Launching App ${appId}...`);
+      log(`⏳ Connecting to: ${url}`);
+
+      try {
+        await fetch(url, { method: 'GET', mode: 'no-cors' });
+        log("✅ App is ready. Redirecting...");
+        setTimeout(() => {
+          window.location.href = url;
+        }, 1000);
+      } catch (e) {
+        log("⚠️ Failed to connect to the app.");
+      }
+    }
+
+    function showInstructions() {
+      log("\n=== 📘 Instructions ===");
+      log("To launch an app, add ?app=1, ?app=2, or ?app=3 to the URL.");
+      log("Example: https://yourdomain.com?app=1");
+      log("\nAvailable Apps:");
+      log("1: MZ News - https://mznews.onrender.com");
+      log("2: The Hadith Daily - https://thehadithdaily.onrender.com");
+      log("3: Third App - https://thirdapp.onrender.com");
+    }
+
+    // Boot Process
+    const appId = getAppId();
+    wakeAllApps();
+    if (appId) {
+      redirectToApp(appId);
+    } else {
+      showInstructions();
+    }
   </script>
 </body>
 </html>
