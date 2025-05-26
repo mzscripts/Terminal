@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Loading Terminal</title>
+  <style>
+    body {
+      background-color: black;
+      color: #00ff00;
+      font-family: monospace;
+      padding: 20px;
+    }
+    .terminal {
+      white-space: pre-line;
+    }
+    .btns {
+      margin-top: 20px;
+    }
+    button {
+      background: #00ff00;
+      color: black;
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal" id="terminal">
+    Initializing system...\n
+  </div>
+  <div class="btns" id="btns" style="display: none;"></div>
+
+  <script>
+    const apps = [
+      { name: "App 1", url: "https://mznews.onrender.com/" },
+      { name: "App 2", url: "https://bhulabhatka.onrender.com/" },
+      { name: "App 3", url: "https://thehadithdaily.onrender.com/" }
+    ];
+
+    const terminal = document.getElementById('terminal');
+    const btns = document.getElementById('btns');
+
+    function log(message) {
+      terminal.innerText += message + '\n';
+    }
+
+    async function pingApps() {
+      log("Waking up services...");
+
+      const results = await Promise.all(apps.map(async (app) => {
+        log(`Pinging ${app.name}...`);
+        try {
+          const res = await fetch(app.url, { method: 'GET' });
+          log(`${app.name} is ready ✅`);
+          return { ...app, status: "ready" };
+        } catch (e) {
+          log(`${app.name} failed to respond ❌`);
+          return { ...app, status: "failed" };
+        }
+      }));
+
+      log("\nAll available apps:");
+
+      btns.style.display = 'block';
+      results.forEach(app => {
+        if (app.status === "ready") {
+          const btn = document.createElement('button');
+          btn.innerText = app.name;
+          btn.onclick = () => window.location.href = app.url;
+          btns.appendChild(btn);
+        }
+      });
+    }
+
+    pingApps();
+  </script>
+</body>
+</html>
