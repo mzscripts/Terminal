@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+ 'll modify the code to include a dynamic progress bar for the dependency downloads using JavaScript, simulating a growing `━━━━` bar for each download step. Additionally, I'll modify the logic to send the app wake-up requests immediately on page load and redirect as soon as possible, without waiting for the animation to complete. The animation will run in the background for visual effect, but it won't delay the functionality.
+
+Here’s the updated code:
+
+<xaiArtifact artifact_id="432c527f-9a2a-416d-89d6-4d14ef9e9015" artifact_version_id="7558c78f-4c0b-48f0-9b9a-06b49952c296" title="index.html" contentType="text/html">
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Launching App...</title>
@@ -33,7 +41,30 @@
     function log(text) {
       terminal.innerText += text + '\n';
       terminal.scrollTop = terminal.scrollHeight; // Auto-scroll to bottom
-      return new Promise(resolve => setTimeout(resolve, 300)); // Simulate delay
+    }
+
+    // Simulate a progress bar animation
+    async function showProgressBar(fileName, fileSize, speed) {
+      const totalBars = 40; // Total length of the progress bar
+      let progress = 0;
+      const interval = 100; // Update every 100ms
+      const steps = Math.floor((fileSize / speed) * 1000 / interval); // Simulate download time
+      const increment = totalBars / steps;
+
+      log(`Downloading ${fileName} (${fileSize} kB)`);
+      let barLine = `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`;
+      terminal.innerText += barLine + '\n';
+
+      while (progress < 100) {
+        await new Promise(resolve => setTimeout(resolve, interval));
+        progress = Math.min(progress + increment * 100 / totalBars, 100);
+        terminal.innerText = terminal.innerText.replace(
+          barLine,
+          `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`
+        );
+        barLine = `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`;
+        terminal.scrollTop = terminal.scrollHeight;
+      }
     }
 
     function getAppId() {
@@ -42,33 +73,33 @@
     }
 
     async function wakeAllApps() {
-      for (const [id, url] of Object.entries(apps)) {
-        await fetch(url, { method: 'GET', mode: 'no-cors' }).then(() => {
+      const promises = Object.entries(apps).map(async ([id, url]) => {
+        try {
+          await fetch(url, { method: 'GET', mode: 'no-cors' });
           log(`✅ APP_${id}: AWAKE SUCCESSFUL -- ${url}`);
-        }).catch(() => {
+        } catch {
           log(`⚠️ APP_${id}: AWAKE FAILED -- ${url}`);
-        });
-      }
+        }
+      });
+      return Promise.all(promises);
     }
 
     async function redirectToApp(appId) {
       const url = apps[appId];
 
       if (!url) {
-        await log("❌ ERROR: INVALID APP ID DETECTED");
+        log("❌ ERROR: INVALID APP ID DETECTED");
         showInstructions();
         return;
       }
 
       try {
         await fetch(url, { method: 'GET', mode: 'no-cors' });
-        await log("✅ APP VERIFICATION COMPLETE -- READY FOR LAUNCH");
-        await log(`REDIRECTING TO TARGET: ${url}`);
-        setTimeout(() => {
-          window.location.href = url;
-        }, 1000);
+        log("✅ APP VERIFICATION COMPLETE -- READY FOR LAUNCH");
+        log(`REDIRECTING TO TARGET: ${url}`);
+        window.location.href = url; // Redirect immediately
       } catch (e) {
-        await log("⚠️ CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
+        log("⚠️ CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
       }
     }
 
@@ -79,53 +110,55 @@
       log("EXAMPLE: https://yourdomain.com?app=1");
     }
 
-    // Simulated Dependency Installation
+    // Simulated Dependency Installation with Progress Bars
     async function simulateDependencyInstallation() {
-      await log("CHECKING SYSTEM REQUIREMENTS... DONE");
-      await log("INITIALIZING DEPENDENCY INSTALLATION...");
-      await log("\n=== 📦 DEPENDENCY REPORT ===");
+      log("CHECKING SYSTEM REQUIREMENTS... DONE");
+      log("INITIALIZING DEPENDENCY INSTALLATION...");
+      log("\n=== 📦 DEPENDENCY REPORT ===");
       
-      await log("Collecting astunparse>=1.6.0 (from app-launcher>=1.0.0)");
-      await log("  Using cached astunparse-1.6.3-py2.py3-none-any.whl.metadata (4.4 kB)");
-      await log("Collecting flatbuffers>=24.3.25 (from app-launcher>=1.0.0)");
-      await log("  Using cached flatbuffers-25.2.10-py2.py3-none-any.whl.metadata (875 bytes)");
-      await log("Collecting gast>=0.2.1 (from app-launcher>=1.0.0)");
-      await log("  Using cached gast-0.6.0-py3-none-any.whl.metadata (1.3 kB)");
-      await log("Collecting google-pasta>=0.1.1 (from app-launcher>=1.0.0)");
-      await log("  Using cached google_pasta-0.2.0-py3-none-any.whl.metadata (814 bytes)");
-      await log("Collecting libclang>=13.0.0 (from app-launcher>=1.0.0)");
-      await log("  Using cached libclang-18.1.1-py2.py3-none-win_amd64.whl.metadata (5.3 kB)");
-      await log("Collecting opt-einsum>=2.3.2 (from app-launcher>=1.0.0)");
-      await log("  Using cached opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)");
-      await log("Collecting protobuf>=3.20.3,<6.0.0dev (from app-launcher>=1.0.0)");
-      await log("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
-      await log("Collecting setuptools (from app-launcher>=1.0.0)");
-      await log("  Using cached setuptools-80.8.0-py3-none-any.whl.metadata (6.6 kB)");
-      await log("Collecting typing-extensions>=3.6.6 (from app-launcher>=1.0.0)");
-      await log("  Using cached typing_extensions-4.13.2-py3-none-any.whl.metadata (3.0 kB)");
-      await log("Collecting wrapt>=1.11.0 (from app-launcher>=1.0.0)");
-      await log("  Using cached wrapt-1.17.2-cp312-cp312-win_amd64.whl.metadata (6.5 kB)");
-      await log("Collecting grpcio>=1.24.3,<2.0 (from app-launcher>=1.0.0)");
-      await log("  Using cached grpcio-1.71.0-cp312-cp312-win_amd64.whl.metadata (4.0 kB)");
-      await log("Collecting numpy (from app-launcher>=1.0.0)");
-      await log("  Using cached numpy-2.1.3-cp312-cp312-win_amd64.whl.metadata (60 kB)");
-      await log("Downloading app-launcher-1.0.0-py3-none-any.whl (108 kB)");
-      await log("   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 108/108 kB 2.5 MB/s eta 0:00:00");
-      await log("Downloading render-client-2.0.0-py3-none-any.whl (25 kB)");
-      await log("   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 25/25 kB 1.8 MB/s eta 0:00:00");
-      await log("\nVERIFYING MODULE INTEGRITY... DONE");
-      await log("DEPENDENCIES: astunparse, flatbuffers, gast, google-pasta, libclang, opt-einsum, protobuf, setuptools, typing-extensions, wrapt, grpcio, numpy -- STATUS: INSTALLED");
-      await log("SYSTEM: render-deployment-agent -- STATUS: READY");
-      await log("\n=== 🚀 APP LAUNCH SEQUENCE ===");
+      log("Collecting astunparse>=1.6.0 (from app-launcher>=1.0.0)");
+      log("  Using cached astunparse-1.6.3-py2.py3-none-any.whl.metadata (4.4 kB)");
+      log("Collecting flatbuffers>=24.3.25 (from app-launcher>=1.0.0)");
+      log("  Using cached flatbuffers-25.2.10-py2.py3-none-any.whl.metadata (875 bytes)");
+      log("Collecting gast>=0.2.1 (from app-launcher>=1.0.0)");
+      log("  Using cached gast-0.6.0-py3-none-any.whl.metadata (1.3 kB)");
+      log("Collecting google-pasta>=0.1.1 (from app-launcher>=1.0.0)");
+      log("  Using cached google_pasta-0.2.0-py3-none-any.whl.metadata (814 bytes)");
+      log("Collecting libclang>=13.0.0 (from app-launcher>=1.0.0)");
+      log("  Using cached libclang-18.1.1-py2.py3-none-win_amd64.whl.metadata (5.3 kB)");
+      log("Collecting opt-einsum>=2.3.2 (from app-launcher>=1.0.0)");
+      log("  Using cached opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)");
+      log("Collecting protobuf>=3.20.3,<6.0.0dev (from app-launcher>=1.0.0)");
+      log("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
+      log("Collecting setuptools (from app-launcher>=1.0.0)");
+      log("  Using cached setuptools-80.8.0-py3-none-any.whl.metadata (6.6 kB)");
+      log("Collecting typing-extensions>=3.6.6 (from app-launcher>=1.0.0)");
+      log("  Using cached typing_extensions-4.13.2-py3-none-any.whl.metadata (3.0 kB)");
+      log("Collecting wrapt>=1.11.0 (from app-launcher>=1.0.0)");
+      log("  Using cached wrapt-1.17.2-cp312-cp312-win_amd64.whl.metadata (6.5 kB)");
+      log("Collecting grpcio>=1.24.3,<2.0 (from app-launcher>=1.0.0)");
+      log("  Using cached grpcio-1.71.0-cp312-cp312-win_amd64.whl.metadata (4.0 kB)");
+      log("Collecting numpy (from app-launcher>=1.0.0)");
+      log("  Using cached numpy-2.1.3-cp312-cp312-win_amd64.whl.metadata (60 kB)");
+      
+      // Downloads with progress bars (running in background)
+      showProgressBar("app-launcher-1.0.0-py3-none-any.whl", 108, 2.5);
+      showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+
+      log("\nVERIFYING MODULE INTEGRITY... DONE");
+      log("DEPENDENCIES: astunparse, flatbuffers, gast, google-pasta, libclang, opt-einsum, protobuf, setuptools, typing-extensions, wrapt, grpcio, numpy -- STATUS: INSTALLED");
+      log("SYSTEM: render-deployment-agent -- STATUS: READY");
+      log("\n=== 🚀 APP LAUNCH SEQUENCE ===");
     }
 
     // Boot Process
     const appId = getAppId();
+
+    // Start wake-up and redirect immediately on page load
     if (appId) {
-      simulateDependencyInstallation().then(() => {
-        wakeAllApps();
-        redirectToApp(appId);
-      });
+      wakeAllApps(); // Start waking apps
+      redirectToApp(appId); // Attempt redirect immediately
+      simulateDependencyInstallation(); // Run animation in background
     } else {
       showInstructions();
     }
