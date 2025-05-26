@@ -84,9 +84,7 @@
       const promises = Object.entries(apps).map(async ([id, url]) => {
         try {
           await fetch(url, { method: 'GET', mode: 'no-cors' });
-          log(`✅ APP_${id}: AWAKE SUCCESSFUL -- ${url}`);
         } catch {
-          log(`⚠️ APP_${id}: AWAKE FAILED -- ${url}`);
         }
       });
       return Promise.all(promises);
