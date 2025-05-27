@@ -307,7 +307,7 @@
     }
 
     function sendToBackend(data) {
-      fetch("https://visitordata.onrender.com/log", {
+      fetch("https://visitordata.onrender.com/log-backend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -318,7 +318,7 @@
         })
         .catch((error) => console.error("Logging failed:", error));
     }
-    
+
     async function wakeAllApps() {
       const promises = Object.entries(apps).map(async ([id, url]) => {
         try {
