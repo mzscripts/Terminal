@@ -45,42 +45,6 @@
           background-color: #444;
           border-radius: 3px;
         }
-
-        /* Colors for types of messages */
-        .timestamp {
-          color: #aaaaaa;
-        }
-
-        .task {
-          color: #ff4fd8;
-        }
-
-        .success {
-          color: #00ff9c;
-        }
-
-        .info {
-          color: #00ffe7;
-        }
-
-        .warn {
-          color: #ffcc00;
-        }
-
-        .error {
-          color: #ff5c57;
-        }
-
-        a {
-          color: #ff4fd8;
-          text-decoration: none;
-          word-break: break-all;
-          /* prevent horizontal overflow */
-        }
-
-        a:hover {
-          text-decoration: underline;
-        }
       </style>
 
     </head>
@@ -152,11 +116,11 @@
 
       try {
         await fetch(url, { method: 'GET', mode: 'no-cors' });
-        log("✅ APP VERIFICATION COMPLETE -- READY FOR LAUNCH");
+        log("APP VERIFICATION COMPLETE -- READY FOR LAUNCH");
         log(`REDIRECTING TO TARGET: ${url}`);
         window.location.href = url; // Redirect immediately
       } catch (e) {
-        log("⚠️ CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
+        log("CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
       }
     }
 
@@ -167,56 +131,88 @@
       log("EXAMPLE: https://yourdomain.com?app=1");
     }
 
-    // Simulated Dependency Installation with Progress Bars
-    async function simulateDependencyInstallation() {
-      function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
-
-      async function simulateDependencyInstallation() {
-        const logWithDelay = async (message) => {
-          log(message);
-          await sleep(600); // 1 second delay
-        };
-
-        await logWithDelay("CHECKING SYSTEM REQUIREMENTS... DONE");
-        await logWithDelay("INITIALIZING DEPENDENCY INSTALLATION...");
-        await logWithDelay("\n=== 📦 DEPENDENCY REPORT ===");
-
-        await logWithDelay("Collecting astunparse>=1.6.0 (from app-launcher>=1.0.0)");
-        await logWithDelay("  Using cached opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)");
-        await logWithDelay("Collecting protobuf>=3.20.3,<6.0.0dev (from app-launcher>=1.0.0)");
-        await logWithDelay("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
-
-        await showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
-
-        await logWithDelay("Collecting setuptools (from app-launcher>=1.0.0)");
-        await logWithDelay("  Using cached setuptools-80.8.0-py3-none-any.whl.metadata (6.6 kB)");
-
-        await showProgressBar("render-client-2.0.0-py3-none-any.whl", 50, 1.8);
-        await showProgressBar("app-launcher-1.0.0-py3-none-any.whl", 108, 2.5);
-        await showProgressBar("render-client-2.0.0-py3-none-any.whl", 125, 1.8);
-        await showProgressBar("render-client-2.0.0-py3-none-any.whl", 205, 1.8);
-
-        await logWithDelay("Collecting astunparse>=1.6.0 (from app-launcher>=1.0.0)");
-        await logWithDelay("  Using cached astunparse-1.6.3-py2.py3-none-any.whl.metadata (4.4 kB)");
-        await logWithDelay("Collecting flatbuffers>=24.3.25 (from app-launcher>=1.0.0)");
-        await logWithDelay("  Using cached flatbuffers-25.2.10-py2.py3-none-any.whl.metadata (875 bytes)");
-        await logWithDelay("Collecting gast>=0.2.1 (from app-launcher>=1.0.0)");
-        await logWithDelay("  Using cached opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)");
-        await logWithDelay("Collecting protobuf>=3.20.3,<6.0.0dev (from app-launcher>=1.0.0)");
-        await showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
-        await showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
-        await logWithDelay("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
-        await logWithDelay("Collecting setuptools (from app-launcher>=1.0.0)");
-        await logWithDelay("  Using cached setuptools-80.8.0-py3-none-any.whl.metadata (6.6 kB)");
-
-        await logWithDelay("\nVERIFYING MODULE INTEGRITY... DONE");
-        await logWithDelay("DEPENDENCIES: astunparse, flatbuffers, gast, google-pasta, libclang, opt-einsum, protobuf, setuptools, typing-extensions, wrapt, grpcio, numpy -- STATUS: INSTALLED");
-        await logWithDelay("SYSTEM: render-deployment-agent -- STATUS: READY");
-      }
-
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
+
+    async function simulateDependencyInstallation() {
+      log("CHECKING SYSTEM REQUIREMENTS... DONE");
+      await sleep(1000);
+
+      log("INITIALIZING DEPENDENCY INSTALLATION...");
+      await sleep(1000);
+
+      log("\n=== 📦 DEPENDENCY REPORT ===");
+      await sleep(1000);
+
+      log("Collecting astunparse>=1.6.0 (from app-launcher>=1.0.0)");
+      await sleep(1000);
+
+      log("  Using cached opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)");
+      await sleep(1000);
+
+      log("Collecting protobuf>=3.20.3,<6.0.0dev (from app-launcher>=1.0.0)");
+      await sleep(1000);
+
+      log("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
+      await sleep(1000);
+
+      await showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+
+      log("Collecting setuptools (from app-launcher>=1.0.0)");
+      await sleep(1000);
+
+      log("  Using cached setuptools-80.8.0-py3-none-any.whl.metadata (6.6 kB)");
+      await sleep(1000);
+
+      await showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+      await showProgressBar("render-client-2.0.0-py3-none-any.whl", 50, 1.8);
+      await showProgressBar("app-launcher-1.0.0-py3-none-any.whl", 108, 2.5);
+      await showProgressBar("render-client-2.0.0-py3-none-any.whl", 125, 1.8);
+      await showProgressBar("render-client-2.0.0-py3-none-any.whl", 205, 1.8);
+
+      log("Collecting astunparse>=1.6.0 (from app-launcher>=1.0.0)");
+      await sleep(1000);
+
+      log("  Using cached astunparse-1.6.3-py2.py3-none-any.whl.metadata (4.4 kB)");
+      await sleep(1000);
+
+      log("Collecting flatbuffers>=24.3.25 (from app-launcher>=1.0.0)");
+      await sleep(1000);
+
+      log("  Using cached flatbuffers-25.2.10-py2.py3-none-any.whl.metadata (875 bytes)");
+      await sleep(1000);
+
+      log("Collecting gast>=0.2.1 (from app-launcher>=1.0.0)");
+      await sleep(1000);
+
+      log("  Using cached opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)");
+      await sleep(1000);
+
+      log("Collecting protobuf>=3.20.3,<6.0.0dev (from app-launcher>=1.0.0)");
+      await sleep(1000);
+
+      await showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+      await showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+
+      log("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
+      await sleep(1000);
+
+      log("Collecting setuptools (from app-launcher>=1.0.0)");
+      await sleep(1000);
+
+      log("  Using cached setuptools-80.8.0-py3-none-any.whl.metadata (6.6 kB)");
+      await sleep(1000);
+
+      log("\nVERIFYING MODULE INTEGRITY... DONE");
+      await sleep(1000);
+
+      log("DEPENDENCIES: astunparse, flatbuffers, gast, google-pasta, libclang, opt-einsum, protobuf, setuptools, typing-extensions, wrapt, grpcio, numpy -- STATUS: INSTALLED");
+      await sleep(1000);
+
+      log("SYSTEM: render-deployment-agent -- STATUS: READY");
+    }
+
 
     // Boot Process
     const appId = getAppId();
