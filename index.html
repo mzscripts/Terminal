@@ -2,56 +2,44 @@
 <html lang="en">
 
 <head>
-  <xaiArtifact artifact_id="432c527f-9a2a-416d-89d6-4d14ef9e9015"
-    artifact_version_id="7558c78f-4c0b-48f0-9b9a-06b49952c296" title="index.html" contentType="text/html">
-    <!DOCTYPE html>
-    <html lang="en">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Launching App...</title>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: #00ffe7;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      padding: 0;
+      margin: 0;
+      font-size: 13px;
+      font-weight: 400;
+      overflow-x: hidden;
+    }
 
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Launching App...</title>
-      <style>
-        body {
-          background-color: #0d0d0d;
-          color: #00ffe7;
-          font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-          padding: 0;
-          margin: 0;
-          font-size: 13px;
-          font-weight: 400;
-          overflow-x: hidden;
-        }
+    .terminal {
+      white-space: pre-wrap;
+      height: 100dvh;
+      overflow-y: auto;
+      line-height: 1.4;
+      padding: 12px;
+      letter-spacing: 0.2px;
+      box-sizing: border-box;
+    }
 
-        .terminal {
-          white-space: pre-wrap;
-          /* wrap long lines on small screens */
-          height: 100dvh;
-          /* better mobile support than 100vh */
-          overflow-y: auto;
-          line-height: 1.4;
-          padding: 12px;
-          font-weight: normal;
-          letter-spacing: 0.2px;
-          box-sizing: border-box;
-        }
+    .terminal::-webkit-scrollbar {
+      width: 6px;
+    }
 
-        /* Scroll improvement on mobile */
-        .terminal::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        .terminal::-webkit-scrollbar-thumb {
-          background-color: #444;
-          border-radius: 3px;
-        }
-      </style>
-
-    </head>
+    .terminal::-webkit-scrollbar-thumb {
+      background-color: #444;
+      border-radius: 3px;
+    }
+  </style>
+</head>
 
 <body>
   <div class="terminal" id="terminal">SYSTEM BOOT INITIALIZED...WAKING UP BACKEND</div>
-
 
   <script>
     const terminal = document.getElementById('terminal');
@@ -64,24 +52,47 @@
 
     function log(text) {
       terminal.innerText += text + '\n';
-      terminal.scrollTop = terminal.scrollHeight; // Auto-scroll to bottom
+      terminal.scrollTop = terminal.scrollHeight;
     }
-
-    // Simulate a progress bar animation
 
     function getAppId() {
       const params = new URLSearchParams(window.location.search);
       return params.get('app');
     }
 
+    function showInstructions() {
+      terminal.innerText = '';
+      log("\n=== SYSTEM INSTRUCTIONS ===");
+      log("LAUNCH PROTOCOL: APPEND ?app=1, ?app=2, OR ?app=3 TO URL");
+      log("EXAMPLE: https://mzscripts.github.io/terminal/?app=1");
+    }
+
     async function wakeAllApps() {
       const promises = Object.entries(apps).map(async ([id, url]) => {
         try {
           await fetch(url, { method: 'GET', mode: 'no-cors' });
-        } catch {
-        }
+        } catch { }
       });
       return Promise.all(promises);
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function startSpinner(label = 'CHECKING APP STATUS') {
+      const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+      let i = 0;
+      const id = setInterval(() => {
+        const frame = frames[i++ % frames.length];
+        terminal.innerText = terminal.innerText.replace(/(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏)/g, '');
+        log(`${label} ${frame}`);
+      }, 100);
+      return id;
+    }
+
+    function stopSpinner(spinnerId) {
+      clearInterval(spinnerId);
     }
 
     async function redirectToApp(appId) {
@@ -93,37 +104,31 @@
         return;
       }
 
+      const spinner = startSpinner();
+
       try {
         await fetch(url, { method: 'GET', mode: 'no-cors' });
-        log("\nREADY FOR LAUNCH");
-        log(`REDIRECTING TO TARGET: ${ url }`);
-        window.location.href = url; // Redirect immediately
+        stopSpinner(spinner);
+        log("\n✅ READY FOR LAUNCH");
+        log(`🔁 REDIRECTING TO TARGET: ${url}`);
+        window.location.href = url;
       } catch (e) {
-        log("CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
+        stopSpinner(spinner);
+        log("❌ CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
       }
     }
 
-    function showInstructions() {
-      terminal.innerText = ''; // Clear terminal for main page
-      log("\n=== SYSTEM INSTRUCTIONS ===");
-      log("LAUNCH PROTOCOL: APPEND ?app=1, ?app=2, OR ?app=3 TO URL");
-      log("EXAMPLE: https://mzscripts.github.io/terminal/?app=1");
-    }
+    // Main Launch Sequence
+    (async () => {
+      const appId = getAppId();
 
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // Boot Process
-    const appId = getAppId();
-
-    // Start wake-up and redirect immediately on page load
-    if (appId) {
-      wakeAllApps(); // Start waking apps
-      redirectToApp(appId);
-    } else {
-      showInstructions();
-    }
+      if (appId) {
+        await wakeAllApps();
+        await redirectToApp(appId);
+      } else {
+        showInstructions();
+      }
+    })();
   </script>
 </body>
 
