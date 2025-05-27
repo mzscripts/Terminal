@@ -1,376 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifying Connection</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <xaiArtifact artifact_id="432c527f-9a2a-416d-89d6-4d14ef9e9015"
+    artifact_version_id="7558c78f-4c0b-48f0-9b9a-06b49952c296" title="index.html" contentType="text/html">
+    <!DOCTYPE html>
+    <html lang="en">
 
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Launching App...</title>
+      <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #1a1a1a;
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+          background-color: #0d0d0d;
+          /* dark background matching terminal */
+          color: #00ffe7;
+          /* default neon cyan text */
+          font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+          padding: 0;
+          margin: 0;
+          font-size: 13px;
+          font-weight: 400;
         }
 
-        .container {
-            text-align: center;
-            max-width: 600px;
-            width: 100%;
+        .terminal {
+          white-space: pre;
+          height: 100vh;
+          overflow-y: auto;
+          line-height: 1.4;
+          padding: 12px;
+          font-weight: normal;
+          letter-spacing: 0.2px;
         }
+      </style>
+    </head>
 
-        .logo {
-            font-size: 2.5rem;
-            font-weight: 300;
-            margin-bottom: 2rem;
-            color: #ffffff;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: #cccccc;
-            margin-bottom: 3rem;
-            font-weight: 400;
-        }
-
-        .verification-box {
-            border: 2px solid #404040;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 2rem auto;
-            max-width: 400px;
-            background-color: #2a2a2a;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .checkbox {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #666;
-            border-radius: 3px;
-            position: relative;
-            cursor: pointer;
-            background-color: #1a1a1a;
-            transition: all 0.3s ease;
-        }
-
-        .checkbox.checking {
-            border-color: #ff6b35;
-            background-color: #ff6b35;
-        }
-
-        .checkbox.checked {
-            border-color: #4CAF50;
-            background-color: #4CAF50;
-        }
-
-        .checkbox::after {
-            content: '';
-            position: absolute;
-            left: 7px;
-            top: 3px;
-            width: 6px;
-            height: 12px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .checkbox.checked::after {
-            opacity: 1;
-        }
-
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid #333;
-            border-top: 2px solid #ff6b35;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .spinner.active {
-            opacity: 1;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .checkbox-label {
-            color: #ffffff;
-            font-size: 1rem;
-        }
-
-        .cloudflare-logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #ff6b35;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .cloudflare-icon {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(45deg, #ff6b35, #f7931e);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .security-message {
-            color: #cccccc;
-            font-size: 1rem;
-            margin-top: 3rem;
-            line-height: 1.5;
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #666;
-            font-size: 0.8rem;
-            text-align: center;
-        }
-
-        .status-message {
-            margin-top: 1rem;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
-
-        .status-checking {
-            background-color: #2a2a2a;
-            color: #ff6b35;
-            border: 1px solid #ff6b35;
-        }
-
-        .status-success {
-            background-color: #1b4332;
-            color: #4CAF50;
-            border: 1px solid #4CAF50;
-        }
-
-        .status-error {
-            background-color: #4a1a1a;
-            color: #ff4444;
-            border: 1px solid #ff4444;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background-color: #333;
-            border-radius: 2px;
-            overflow: hidden;
-            margin-top: 1rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff6b35, #f7931e);
-            width: 0%;
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }
-    </style>
-</head>
 <body>
-    <div class="container">
-        <h1 class="logo">testcisia.it</h1>
-        <p class="subtitle">Verifying you are human. This may take a few seconds.</p>
-        
-        <div class="verification-box">
-            <div class="checkbox-container">
-                <div class="checkbox-wrapper">
-                    <div class="checkbox" id="checkbox"></div>
-                    <span class="checkbox-label">Verify you are human</span>
-                </div>
-                <div class="cloudflare-logo">
-                    <div class="cloudflare-icon">CF</div>
-                    <span>CLOUDFLARE</span>
-                </div>
-            </div>
-            <div class="spinner" id="spinner"></div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="status-message" id="statusMessage"></div>
-        </div>
-        
-        <p class="security-message">
-            testcisia.it needs to review the security of your connection before proceeding.
-        </p>
-    </div>
+  <div class="terminal" id="terminal">SYSTEM BOOT INITIALIZED...\n</div>
 
-    <div class="footer">
-        <div>Ray ID: 85c7e7d04ca21be8</div>
-        <div>Performance & security by Cloudflare</div>
-    </div>
+  <script>
+    const terminal = document.getElementById('terminal');
 
-    <script>
-        const appUrls = {
-            '1': 'https://mznews.onrender.com',
-            '2': 'https://thehadithdaily.onrender.com',
-            '3': 'https://bhulabhatka.onrender.com'
-        };
+    const apps = {
+      '1': 'https://mznews.onrender.com',
+      '2': 'https://thehadithdaily.onrender.com',
+      '3': 'https://bhulabhatka.onrender.com'
+    };
 
-        function getAppId() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('app');
+    function log(text) {
+      terminal.innerText += text + '\n';
+      terminal.scrollTop = terminal.scrollHeight; // Auto-scroll to bottom
+    }
+
+    // Simulate a progress bar animation
+    async function showProgressBar(fileName, fileSize, speed) {
+      const totalBars = 40; // Total length of the progress bar
+      let progress = 0;
+      const interval = 100; // Update every 100ms
+      const steps = Math.floor((fileSize / speed) * 1000 / interval); // Simulate download time
+      const increment = totalBars / steps;
+
+      log(`Downloading ${fileName} (${fileSize} kB)`);
+      let barLine = `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`;
+      terminal.innerText += barLine + '\n';
+
+      while (progress < 100) {
+        await new Promise(resolve => setTimeout(resolve, interval));
+        progress = Math.min(progress + increment * 100 / totalBars, 100);
+        terminal.innerText = terminal.innerText.replace(
+          barLine,
+          `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`
+        );
+        barLine = `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`;
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    }
+
+    function getAppId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('app');
+    }
+
+    async function wakeAllApps() {
+      const promises = Object.entries(apps).map(async ([id, url]) => {
+        try {
+          await fetch(url, { method: 'GET', mode: 'no-cors' });
+        } catch {
         }
+      });
+      return Promise.all(promises);
+    }
 
-        function getTargetUrl() {
-            const appId = getAppId();
-            return appUrls[appId] || appUrls['1']; // Default to app 1 if no valid app ID
-        }
+    async function redirectToApp(appId) {
+      const url = apps[appId];
 
-        async function wakeUpBackend(url) {
-            try {
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'no-cors' // To avoid CORS issues
-                });
-                return true;
-            } catch (error) {
-                console.log('Wake-up request sent (CORS expected):', error);
-                return true; // Consider it successful since we expect CORS errors
-            }
-        }
+      if (!url) {
+        log("❌ ERROR: INVALID APP ID DETECTED");
+        showInstructions();
+        return;
+      }
 
-        async function checkBackendStatus(url) {
-            try {
-                const response = await fetch(url, {
-                    method: 'HEAD',
-                    mode: 'no-cors'
-                });
-                return true;
-            } catch (error) {
-                return true; // Assume it's working after wake-up attempt
-            }
-        }
+      try {
+        await fetch(url, { method: 'GET', mode: 'no-cors' });
+        log("✅ APP VERIFICATION COMPLETE -- READY FOR LAUNCH");
+        log(`REDIRECTING TO TARGET: ${url}`);
+        window.location.href = url; // Redirect immediately
+      } catch (e) {
+        log("⚠️ CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
+      }
+    }
 
-        function updateStatus(message, type) {
-            const statusElement = document.getElementById('statusMessage');
-            statusElement.textContent = message;
-            statusElement.className = `status-message status-${type}`;
-        }
+    function showInstructions() {
+      terminal.innerText = ''; // Clear terminal for main page
+      log("\n=== 📘 SYSTEM INSTRUCTIONS ===");
+      log("LAUNCH PROTOCOL: APPEND ?app=1, ?app=2, OR ?app=3 TO URL");
+      log("EXAMPLE: https://yourdomain.com?app=1");
+    }
 
-        function updateProgress(percentage) {
-            const progressFill = document.getElementById('progressFill');
-            progressFill.style.width = `${percentage}%`;
-        }
+    // Simulated Dependency Installation with Progress Bars
+    async function simulateDependencyInstallation() {
+      log("CHECKING SYSTEM REQUIREMENTS... DONE");
+      log("INITIALIZING DEPENDENCY INSTALLATION...");
+      log("\n=== 📦 DEPENDENCY REPORT ===");
 
-        async function simulateVerification() {
-            const checkbox = document.getElementById('checkbox');
-            const spinner = document.getElementById('spinner');
-            const targetUrl = getTargetUrl();
-            
-            // Start verification animation
-            setTimeout(() => {
-                checkbox.classList.add('checking');
-                spinner.classList.add('active');
-                updateStatus('Checking security...', 'checking');
-                updateProgress(20);
-            }, 1000);
+      log("Collecting astunparse>=1.6.0 (from app-launcher>=1.0.0)");
+      log("  Using cached astunparse-1.6.3-py2.py3-none-any.whl.metadata (4.4 kB)");
+      log("Collecting flatbuffers>=24.3.25 (from app-launcher>=1.0.0)");
+      log("  Using cached flatbuffers-25.2.10-py2.py3-none-any.whl.metadata (875 bytes)");
+      log("Collecting gast>=0.2.1 (from app-launcher>=1.0.0)");
+      log("  Using cached gast-0.6.0-py3-none-any.whl.metadata (1.3 kB)");
+      log("Collecting google-pasta>=0.1.1 (from app-launcher>=1.0.0)");
+      log("  Using cached google_pasta-0.2.0-py3-none-any.whl.metadata (814 bytes)");
+      log("Collecting libclang>=13.0.0 (from app-launcher>=1.0.0)");
+      log("  Using cached libclang-18.1.1-py2.py3-none-win_amd64.whl.metadata (5.3 kB)");
+      log("Collecting opt-einsum>=2.3.2 (from app-launcher>=1.0.0)");
+      log("  Using cached opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)");
+      log("Collecting protobuf>=3.20.3,<6.0.0dev (from app-launcher>=1.0.0)");
+      log("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
+      showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+      log("Collecting setuptools (from app-launcher>=1.0.0)");
+      log("  Using cached setuptools-80.8.0-py3-none-any.whl.metadata (6.6 kB)");
 
-            // Wake up backend
-            setTimeout(async () => {
-                updateStatus('Waking up backend...', 'checking');
-                updateProgress(40);
-                await wakeUpBackend(targetUrl);
-            }, 2000);
 
-            // Check backend status
-            setTimeout(async () => {
-                updateStatus('Verifying backend status...', 'checking');
-                updateProgress(60);
-                await checkBackendStatus(targetUrl);
-            }, 3500);
+      // Downloads with progress bars (running in background)
+      showProgressBar("app-launcher-1.0.0-py3-none-any.whl", 108, 2.5);
+      showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+      showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+      showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+      showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+      log("Collecting astunparse>=1.6.0 (from app-launcher>=1.0.0)");
+      log("  Using cached astunparse-1.6.3-py2.py3-none-any.whl.metadata (4.4 kB)");
+      log("Collecting flatbuffers>=24.3.25 (from app-launcher>=1.0.0)");
+      log("  Using cached flatbuffers-25.2.10-py2.py3-none-any.whl.metadata (875 bytes)");
+      log("Collecting gast>=0.2.1 (from app-launcher>=1.0.0)");
+      log("  Using cached opt_einsum-3.4.0-py3-none-any.whl.metadata (6.3 kB)");
+      log("Collecting protobuf>=3.20.3,<6.0.0dev (from app-launcher>=1.0.0)");
+      showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+      showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+      log("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
+      log("Collecting setuptools (from app-launcher>=1.0.0)");
+      log("  Using cached setuptools-80.8.0-py3-none-any.whl.metadata (6.6 kB)");
+      log("\nVERIFYING MODULE INTEGRITY... DONE");
+      log("DEPENDENCIES: astunparse, flatbuffers, gast, google-pasta, libclang, opt-einsum, protobuf, setuptools, typing-extensions, wrapt, grpcio, numpy -- STATUS: INSTALLED");
+      log("SYSTEM: render-deployment-agent -- STATUS: READY");
+    }
 
-            // Complete verification
-            setTimeout(() => {
-                checkbox.classList.remove('checking');
-                checkbox.classList.add('checked');
-                spinner.classList.remove('active');
-                updateStatus('Verification complete!', 'success');
-                updateProgress(100);
-            }, 5000);
+    // Boot Process
+    const appId = getAppId();
 
-            // Redirect
-            setTimeout(() => {
-                updateStatus('Redirecting...', 'success');
-                window.location.href = targetUrl;
-            }, 6000);
-        }
-
-        // Auto-click simulation
-        function autoClick() {
-            const checkbox = document.getElementById('checkbox');
-            
-            // Simulate click after 500ms
-            setTimeout(() => {
-                checkbox.click();
-                simulateVerification();
-            }, 500);
-        }
-
-        // Add click event listener
-        document.getElementById('checkbox').addEventListener('click', (e) => {
-            e.preventDefault();
-            if (!document.getElementById('checkbox').classList.contains('checking')) {
-                simulateVerification();
-            }
-        });
-
-        // Start auto-click when page loads
-        window.addEventListener('load', () => {
-            autoClick();
-        });
-
-        // Also start immediately if page is already loaded
-        if (document.readyState === 'complete') {
-            autoClick();
-        }
-    </script>
+    // Start wake-up and redirect immediately on page load
+    if (appId) {
+      wakeAllApps(); // Start waking apps
+      redirectToApp(appId); // Attempt redirect immediately
+      simulateDependencyInstallation(); // Run animation in background
+    } else {
+      showInstructions();
+    }
+  </script>
 </body>
+
 </html>
