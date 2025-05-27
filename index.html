@@ -116,7 +116,12 @@
 
       try {
         await fetch(url, { method: 'GET', mode: 'no-cors' });
-        log("APP VERIFICATION COMPLETE -- READY FOR LAUNCH");
+        log("WAKING UP BACKEND -- READY FOR LAUNCH");
+        log("  Using cached protobuf-5.29.4-cp310-abi3-win_amd64.whl.metadata (592 bytes)");
+        await sleep(1000);
+        await showProgressBar("render-client-2.0.0-py3-none-any.whl", 25, 1.8);
+        await showProgressBar("render-client-2.0.0-py3-none-any.whl", 50, 1.8);
+        await showProgressBar("app-launcher-1.0.0-py3-none-any.whl", 108, 2.5);
         log(`REDIRECTING TO TARGET: ${url}`);
         window.location.href = url; // Redirect immediately
       } catch (e) {
@@ -128,7 +133,7 @@
       terminal.innerText = ''; // Clear terminal for main page
       log("\n=== 📘 SYSTEM INSTRUCTIONS ===");
       log("LAUNCH PROTOCOL: APPEND ?app=1, ?app=2, OR ?app=3 TO URL");
-      log("EXAMPLE: https://yourdomain.com?app=1");
+      log("EXAMPLE: https://mzscripts.github.io/terminal/?app=1");
     }
 
     function sleep(ms) {
