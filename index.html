@@ -88,32 +88,20 @@
       const url = apps[appId];
 
       if (!url) {
-        log("ERROR: INVALID APP ID DETECTED");
+        log("❌ ERROR: INVALID APP ID DETECTED");
         showInstructions();
         return;
       }
 
-      log("\nWAKING UP BACKEND...");
-      startSpinner(); // Show animation
-
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 4000); // fallback timeout
-
-        await fetch(url, { method: 'GET', mode: 'no-cors', signal: controller.signal });
-
-        clearTimeout(timeout);
-        stopSpinner(); // Stop animation
-
-        log("\n READY FOR LAUNCH");
-        log(`REDIRECTING TO TARGET: ${url}`);
-        window.location.href = url;
+        await fetch(url, { method: 'GET', mode: 'no-cors' });
+        log("\nREADY FOR LAUNCH");
+        log(`REDIRECTING TO TARGET: ${ url }`);
+        window.location.href = url; // Redirect immediately
       } catch (e) {
-        stopSpinner(); // Stop spinner even if error
-        log(" CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
+        log("CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
       }
     }
-
 
     function showInstructions() {
       terminal.innerText = ''; // Clear terminal for main page
@@ -126,33 +114,13 @@
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async function simulateDependencyInstallation() {
-      let spinnerInterval;
-
-      function startSpinner() {
-        const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-        let i = 0;
-
-        spinnerInterval = setInterval(() => {
-          const spinner = `\nINITIALIZING ${frames[i++ % frames.length]}`;
-          terminal.innerText += spinner;
-          terminal.scrollTop = terminal.scrollHeight;
-        }, 100);
-      }
-
-      function stopSpinner() {
-        clearInterval(spinnerInterval);
-      }
-    }
-
     // Boot Process
     const appId = getAppId();
 
     // Start wake-up and redirect immediately on page load
     if (appId) {
       wakeAllApps(); // Start waking apps
-      redirectToApp(appId); // Attempt redirect immediately
-      simulateDependencyInstallation(); // Run animation in background
+      redirectToApp(appId);
     } else {
       showInstructions();
     }
