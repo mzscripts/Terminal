@@ -50,7 +50,9 @@
     </head>
 
 <body>
-  <div class="terminal" id="terminal">SYSTEM BOOT INITIALIZED...\n</div>
+  <div class="terminal" id="terminal">SYSTEM BOOT INITIALIZED...</div>
+  <div class="terminal" id="terminal">WAKING UP BACKEND</div>
+
 
   <script>
     const terminal = document.getElementById('terminal');
@@ -116,7 +118,7 @@
 
       try {
         await fetch(url, { method: 'GET', mode: 'no-cors' });
-        log("WAKING UP BACKEND -- READY FOR LAUNCH");
+        log("READY FOR LAUNCH");
         log(`REDIRECTING TO TARGET: ${url}`);
         window.location.href = url; // Redirect immediately
       } catch (e) {
