@@ -68,28 +68,6 @@
     }
 
     // Simulate a progress bar animation
-    async function showProgressBar(fileName, fileSize, speed) {
-      const totalBars = 40; // Total length of the progress bar
-      let progress = 0;
-      const interval = 100; // Update every 100ms
-      const steps = Math.floor((fileSize / speed) * 1000 / interval); // Simulate download time
-      const increment = totalBars / steps;
-
-      log(`Downloading ${fileName} (${fileSize} kB)`);
-      let barLine = `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`;
-      terminal.innerText += barLine + '\n';
-
-      while (progress < 100) {
-        await new Promise(resolve => setTimeout(resolve, interval));
-        progress = Math.min(progress + increment * 100 / totalBars, 100);
-        terminal.innerText = terminal.innerText.replace(
-          barLine,
-          `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`
-        );
-        barLine = `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`;
-        terminal.scrollTop = terminal.scrollHeight;
-      }
-    }
 
     function getAppId() {
       const params = new URLSearchParams(window.location.search);
@@ -137,10 +115,21 @@
     }
 
     async function simulateDependencyInstallation() {
-      log("\n....");
-      await sleep(700);
-    }
+      const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+      let i = 0;
 
+      process.stdout.write('\nInstalling dependencies ');
+
+      const spinner = setInterval(() => {
+        process.stdout.write(`\rInstalling dependencies ${frames[i++ % frames.length]} `);
+      }, 100);
+
+      // Simulate delay (e.g., 3 seconds)
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      clearInterval(spinner);
+      process.stdout.write('\r✔ Dependencies installed!        \n');
+    }
 
     // Boot Process
     const appId = getAppId();
