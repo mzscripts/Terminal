@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fare Verification</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f2f4f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      text-align: center;
+    }
+
+    .card h2 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: #666;
+      font-size: 15px;
+    }
+
+    .loader {
+      margin: 25px auto;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #007bff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 16px;
+      color: green;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Verifying Your Fare</h2>
+    <p>Hold on while we confirm the latest price for your selected flight...</p>
+
+    <div class="loader" id="loader"></div>
+
+    <button class="btn" onclick="startVerification()">Verify Now</button>
+
+    <div class="status" id="statusMessage">✔️ Fare verified successfully. You may proceed to payment.</div>
+  </div>
+
+  <script>
+    function startVerification() {
+      const loader = document.getElementById("loader");
+      const status = document.getElementById("statusMessage");
+
+      loader.style.display = "block";
+      status.style.display = "none";
+
+      setTimeout(() => {
+        loader.style.display = "none";
+        status.style.display = "block";
+      }, 2500); // simulate API delay
+    }
+  </script>
+</body>
+</html>
