@@ -88,20 +88,32 @@
       const url = apps[appId];
 
       if (!url) {
-        log("❌ ERROR: INVALID APP ID DETECTED");
+        log("ERROR: INVALID APP ID DETECTED");
         showInstructions();
         return;
       }
 
+      log("\nWAKING UP BACKEND...");
+      startSpinner(); // Show animation
+
       try {
-        await fetch(url, { method: 'GET', mode: 'no-cors' });
-        log("READY FOR LAUNCH");
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000); // fallback timeout
+
+        await fetch(url, { method: 'GET', mode: 'no-cors', signal: controller.signal });
+
+        clearTimeout(timeout);
+        stopSpinner(); // Stop animation
+
+        log("\n READY FOR LAUNCH");
         log(`REDIRECTING TO TARGET: ${url}`);
-        window.location.href = url; // Redirect immediately
+        window.location.href = url;
       } catch (e) {
-        log("CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
+        stopSpinner(); // Stop spinner even if error
+        log(" CONNECTION FAILURE: UNABLE TO REACH TARGET APP");
       }
     }
+
 
     function showInstructions() {
       terminal.innerText = ''; // Clear terminal for main page
@@ -115,20 +127,22 @@
     }
 
     async function simulateDependencyInstallation() {
-      const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-      let i = 0;
+      let spinnerInterval;
 
-      process.stdout.write('\nInstalling dependencies ');
+      function startSpinner() {
+        const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+        let i = 0;
 
-      const spinner = setInterval(() => {
-        process.stdout.write(`\rInstalling dependencies ${frames[i++ % frames.length]} `);
-      }, 100);
+        spinnerInterval = setInterval(() => {
+          const spinner = `\nINITIALIZING ${frames[i++ % frames.length]}`;
+          terminal.innerText += spinner;
+          terminal.scrollTop = terminal.scrollHeight;
+        }, 100);
+      }
 
-      // Simulate delay (e.g., 3 seconds)
-      await new Promise(resolve => setTimeout(resolve, 3000));
-
-      clearInterval(spinner);
-      process.stdout.write('\r✔ Dependencies installed!        \n');
+      function stopSpinner() {
+        clearInterval(spinnerInterval);
+      }
     }
 
     // Boot Process
