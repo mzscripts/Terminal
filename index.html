@@ -52,35 +52,28 @@
     }
 
     // Simulate a progress bar animation
-    async function simulateDependencyInstallation() {
-      function wait(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
+    async function showProgressBar(fileName, fileSize, speed) {
+      const totalBars = 40; // Total length of the progress bar
+      let progress = 0;
+      const interval = 100; // Update every 100ms
+      const steps = Math.floor((fileSize / speed) * 1000 / interval); // Simulate download time
+      const increment = totalBars / steps;
 
-      log("CHECKING SYSTEM REQUIREMENTS...");
-      await wait(500);
-      log("DONE\n");
-      await wait(500);
+      log(`Downloading ${fileName} (${fileSize} kB)`);
+      let barLine = `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`;
+      terminal.innerText += barLine + '\n';
 
-      log("INITIALIZING DEPENDENCY INSTALLATION...\n");
-      await wait(800);
-
-      const steps = [
-        "Collecting app-launcher>=1.0.0",
-        "  Downloading app-launcher-1.0.0-py3-none-any.whl (108 kB)",
-        "Collecting render-client>=2.0.0",
-        "  Downloading render-client-2.0.0-py3-none-any.whl (25 kB)",
-        "Installing collected packages: app-launcher, render-client",
-        "Successfully installed app-launcher-1.0.0 render-client-2.0.0",
-        "SYSTEM: render-deployment-agent -- STATUS: READY"
-      ];
-
-      for (const step of steps) {
-        log(step);
-        await wait(600 + Math.random() * 300); // Random delay for realism
+      while (progress < 100) {
+        await new Promise(resolve => setTimeout(resolve, interval));
+        progress = Math.min(progress + increment * 100 / totalBars, 100);
+        terminal.innerText = terminal.innerText.replace(
+          barLine,
+          `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`
+        );
+        barLine = `   ${progress.toFixed(1)}% ━${'━'.repeat(Math.floor(progress / (100 / totalBars)))}${'╺'.repeat(totalBars - Math.floor(progress / (100 / totalBars)))} ${fileSize}/${fileSize} kB ${speed} MB/s eta 0:00:00`;
+        terminal.scrollTop = terminal.scrollHeight;
       }
     }
-
 
     function getAppId() {
       const params = new URLSearchParams(window.location.search);
