@@ -318,8 +318,9 @@
         .catch((error) => console.error("Logging failed:", error));
     }
 
-    async function wakeAllApps() {
+    async function wakeAllApps(excludeAppId = null) {
       const promises = Object.entries(apps).map(async ([id, url]) => {
+        if (id === excludeAppId) return;
         try {
           await fetch(url, { method: 'GET', mode: 'no-cors' });
         } catch { }
@@ -348,7 +349,7 @@
       const appId = getAppId();
       fetchGeoInfo(); // Call API to log visitor data on load
       if (appId) {
-        await wakeAllApps();
+        void wakeAllApps(appId);
         await redirectToApp(appId);
       } else {
         showInstructions();
